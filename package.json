@@ -1,0 +1,20 @@
+{
+  "name": "time-schedule-squash",
+  "version": "1.0.0",
+  "description": "Easily manage time scheduling with ease. If intersecting time schedules exist, combine them into one.",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "time",
+    "scheduling",
+    "time-scheduling"
+  ],
+  "author": "Tochukwu Nkemdilim <nkemdilimtochukwu@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/lodash": "^4.14.149",
+    "lodash": "^4.17.15"
+  }
+}
