@@ -9,7 +9,7 @@ Assume you have the following time schedules:
 - 3pm - 6pm
 - 1am - 3am
 
-If you take a close look, you'll recognize that `2pm - 5pm` and `3pm-6pm` inter-lap. This schedules could simply be reduced without losing information as shown below:
+If you take a close look, you'll recognize that `2pm - 5pm` and `3pm - 6pm` inter-lap. This schedules could simply be reduced without losing information as shown below:
 - 2pm - 6pm
 - 1am - 3am
 
@@ -24,7 +24,8 @@ Here is a basic example.
 ```ts
 import Minimas, { Schedule } from 'minimas';
 
-// Initialize Schedules (timestamp is useful if you're schedules are synced from multiple sources).
+// Initialize Schedules (timestamp is useful if 
+// schedules are synced from multiple sources).
 const schedules = [
     new Schedule(14, 17, new Date()),   // "2020-12-08 12:00:00"
     new Schedule(15, 18, new Date()),   // "2020-12-08 12:00:01"

@@ -2,6 +2,9 @@
   "name": "minimas",
   "version": "1.0.0",
   "description": "Manage time schedules with ease",
+  "repository": {
+    "url": "https://github.com/TNkemdilim/minimas"
+  },
   "main": "index.js",
   "scripts": {
     "test": "test"
