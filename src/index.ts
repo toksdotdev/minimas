@@ -1,10 +1,33 @@
-import _ from "lodash";
-import DateUtil from "./utils/date";
-import Schedule from "./utils/schedule";
+import _ from 'lodash';
+import Schedule from './schedule';
+import { squashOverlappingSchedules } from './utils/squasher';
 
-class TimeSchedule {
-  constructor(private schedule: Schedule[]) {
-    this._sortSchedule();
+class Minimas {
+  /**
+   * Create an instance of Minimas.
+   * @param schedules Initial schedules
+   */
+  constructor(private schedules: Schedule[] = []) {
+    this._sort();
+  }
+
+  /**
+   * Get the underlying squashed schedules.
+   */
+  getAll() {
+    return this.schedules;
+  }
+
+  /**
+   * Delete a schedule by it's index.
+   *
+   * The index of a shedule can be retrieved by using it's index
+   * as returned from `.getAll()`.
+   *
+   * @param index Index of schedule to delete.
+   */
+  public deleteByIndex(index: number) {
+    this.schedules = this.schedules.splice(index, 1);
   }
 
   /**
@@ -16,109 +39,27 @@ class TimeSchedule {
    * @param schedule Schedule to add
    */
   add(schedule: Schedule) {
-    schedule =
-      schedule.from > schedule.to
-        ? {
-            from: schedule.to,
-            to: schedule.from,
-            timestamp: schedule.timestamp
-          }
-        : schedule;
+    if (schedule.from < schedule.to) {
+      schedule = new Schedule(schedule.to, schedule.from, schedule.timestamp);
+    }
 
-    this.schedule.push(schedule);
-    this._sortSchedule();
-  }
-
-  /**
-   * Delete a schedule from the list using it's index.
-   *
-   * @param index Index of item to delete.
-   */
-  deleteByIndex(index: number): Schedule[] {
-    return this.schedule.splice(index, 1);
+    this.schedules.push(schedule);
+    this._sort();
   }
 
   /**
    * Sort the available list of schedule items. If a schedule intersects,
    * it is automatically merged and arranged.
    */
-  private _sortSchedule() {
+  private _sort() {
     const orderedSchedules = _.orderBy(
-      this.schedule,
-      ["from", "to"],
-      ["asc", "desc"]
+      this.schedules,
+      ['from', 'to'],
+      ['asc', 'desc']
     );
 
-    const uniqueSchedules = _.uniqBy(orderedSchedules, "from");
-
-    const arrangedSchedules = uniqueSchedules.reduce(
-      (schedules: Schedule[], schedule: Schedule) => {
-        const lastItem = schedules[schedules.length - 1];
-
-        if (schedules.length === 0) {
-          schedules.push(schedule);
-          return schedules;
-        }
-
-        if (Schedule.outOfBoundary(lastItem, schedule)) {
-          schedules.push(schedule);
-        } else if (
-          (schedule.from < lastItem.from && schedule.to === lastItem.from) ||
-          (schedule.from < lastItem.from &&
-            schedule.to > lastItem.from &&
-            schedule.to < lastItem.to)
-        ) {
-          if (
-            DateUtil.getPosix(schedule.timestamp) >
-            DateUtil.getPosix(lastItem.timestamp)
-          ) {
-            schedules[schedules.length - 1].from = schedule.from;
-            schedules[schedules.length - 1].timestamp = schedule.timestamp;
-          }
-        } else if (
-          (schedule.from === lastItem.from && schedule.to < lastItem.to) ||
-          (schedule.from === lastItem.from && schedule.to === lastItem.to) ||
-          (schedule.from < lastItem.to && schedule.to === lastItem.to)
-        ) {
-          if (
-            DateUtil.getPosix(schedule.timestamp) >
-            DateUtil.getPosix(lastItem.timestamp)
-          ) {
-            schedules[schedules.length - 1].timestamp = schedule.timestamp;
-          }
-          return schedules;
-        } else if (
-          (schedule.from < lastItem.to && schedule.to > lastItem.to) ||
-          (schedule.from === lastItem.to && schedule.to > lastItem.to) ||
-          (schedule.from > lastItem.from && schedule.to < lastItem.to)
-        ) {
-          if (
-            DateUtil.getPosix(schedule.timestamp) >
-            DateUtil.getPosix(lastItem.timestamp)
-          ) {
-            schedules[schedules.length - 1].to = schedule.to;
-            schedules[schedules.length - 1].timestamp = schedule.timestamp;
-          }
-        } else if (schedule.from < lastItem.from && schedule.to > lastItem.to) {
-          if (
-            DateUtil.getPosix(schedule.timestamp) >
-            DateUtil.getPosix(lastItem.timestamp)
-          ) {
-            schedules[schedules.length - 1].from = schedule.from;
-            schedules[schedules.length - 1].to = schedule.to;
-            schedules[schedules.length - 1].timestamp = schedule.timestamp;
-          }
-        } else {
-          throw Error("No condition yet");
-        }
-
-        return schedules;
-      },
-      []
-    );
-
-    this.schedule = arrangedSchedules;
+    this.schedules = squashOverlappingSchedules(_.uniqBy(orderedSchedules, 'from'));
   }
 }
 
-export default TimeSchedule;
+export default Minimas;

@@ -1,7 +1,7 @@
 {
-  "name": "time-schedule-squash",
+  "name": "minimas",
   "version": "1.0.0",
-  "description": "Easily manage time scheduling with ease. If intersecting time schedules exist, combine them into one.",
+  "description": "Manage time schedules with ease",
   "main": "index.js",
   "scripts": {
     "test": "test"
